@@ -13,7 +13,7 @@ from werkzeug.urls import url_parse
 @login_required
 def index():
     posts = Post.query.all()
-    return render_template('index.html', title='test', user=current_user, posts=posts)
+    return render_template('index.html', title='test', posts=posts)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -53,3 +53,13 @@ def register():
         flash('Congratulation, you are now a register user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+
+@app.route('/user/<username>')
+@login_required
+def user(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    posts = []
+    if user is not None:
+        posts = Post.query.filter_by(user_id=user.id).all()
+    return render_template('user.html', user=user, posts=posts)
